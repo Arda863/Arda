@@ -1,22 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <head>
   <meta charset="UTF-8">
-  <title>That's him! - Ultra Edition</title>
+  <title>That's him! - Ultimate Edition</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.png" type="image/png">
   <meta name="theme-color" content="#6200ea">
   <style>
-    /* hier bleibt dein gesamtes CSS */
-  </style>
-</head>
-  <style>
-    body {<div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#6200ea;color:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:1000;">
-  <h1 style="font-size:50px;">🎉 That's him! 🎉</h1>
-  <p>Bereit für Spaß...</p>
-</div>
-
+    body {
       font-family: 'Arial', sans-serif;
       text-align: center;
       padding: 20px;
@@ -89,12 +80,28 @@
       background: none;
       border: none;
     }
+    .exploding-btn {
+      animation: explode 0.5s forwards;
+    }
+    @keyframes explode {
+      0% {
+        transform: scale(1);
+      }
+      100% {
+        transform: scale(1.5) rotate(45deg);
+      }
+    }
   </style>
 </head>
 
 <body class="light">
 
   <h1>That's him! 🎉</h1>
+
+  <div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#6200ea;color:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:1000;">
+    <h1 style="font-size:50px;">🎉 That's him! 🎉</h1>
+    <p>Bereit für Spaß...</p>
+  </div>
 
   <div id="question">Willkommen!</div>
 
@@ -116,12 +123,6 @@
   <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;" class="hidden"></canvas>
 
   <script>
-    // Splashscreen automatisch ausblenden
-window.onload = function() {
-  setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-  }, 1500); // Splashscreen 1,5 Sekunden
-};
     let defaultQuestions = [
       "Wer würde am ehesten sein Handy im Klo versenken?",
       "Wer würde am ehesten nackt durch die Stadt laufen?",
@@ -138,6 +139,7 @@ window.onload = function() {
     let currentQuestion = "";
     let timer;
     let countdown = 15;
+    let roundCount = 5; // Default rounds
 
     const allEmojis = ["😎", "🤡", "🦄", "🐉", "🧙‍♂️", "🐱‍👤", "🎃", "🧛", "👻", "🤖", "🐸", "🦖", "👑", "🚀", "🐱", "🐶", "🦊", "🐼", "🐵", "🐧", "🦋", "🐢", "🐙"];
 
@@ -205,45 +207,45 @@ window.onload = function() {
         updateTimer();
         if (countdown <= 0) {
           clearInterval(timer);
-          alert("Zeit abgelaufen! 😬");
           nextQuestion();
         }
       }, 1000);
     }
 
     function updateTimer() {
-      document.getElementById('timer').innerText = `⏳ Zeit: ${countdown}s`;
+      document.getElementById('timer').innerText = `Zeit: ${countdown}s`;
     }
 
-    function selectPlayer(playerName) {
-      document.getElementById('clickSound').play();
-      scores[playerName]++;
-      alert(`${playerName} wurde gewählt! 🎉 (+1 Punkt)`);
+    function selectPlayer(player) {
+      scores[player]++;
+      showExplosionEffect();
       nextQuestion();
     }
 
-    function endGame() {
-      document.getElementById('players').innerHTML = "";
-      document.getElementById('next-btn').classList.add('hidden');
-      document.getElementById('timer').classList.add('hidden');
-      document.getElementById('question').innerText = "Spiel beendet! 🎊";
-      document.getElementById('result').classList.remove('hidden');
-      
-      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-      let resultHtml = "<h2>🏆 Highscore:</h2><ul>";
-      sorted.forEach(([player, points]) => {
-        resultHtml += `<li>${player}: ${points} Punkte</li>`;
-      });
-      resultHtml += "</ul>";
-      document.getElementById('result').innerHTML = resultHtml;
+    function showExplosionEffect() {
+      let selectedPlayerBtn = event.target;
+      selectedPlayerBtn.classList.add('exploding-btn');
+      setTimeout(() => {
+        selectedPlayerBtn.classList.remove('exploding-btn');
+      }, 500);
+    }
 
-      launchConfetti();
-      document.getElementById('winSound').play();
+    function endGame() {
+      let winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+      let highestScore = scores[winner];
+      document.getElementById('result').innerText = `Spiel beendet! Der Gewinner ist ${winner} mit ${highestScore} Punkten!`;
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
     }
 
     function toggleMode() {
-      document.body.classList.toggle('dark');
-      document.body.classList.toggle('light');
+      if (document.body.classList.contains('light')) {
+        document.body.classList.remove('light');
+        document.body.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+        document.body.classList.add('light');
+      }
     }
 
     function shuffleArray(array) {
@@ -253,34 +255,11 @@ window.onload = function() {
       }
     }
 
-    function launchConfetti() {
-      const confettiCanvas = document.getElementById('confetti-canvas');
-      confettiCanvas.classList.remove('hidden');
-      const ctx = confettiCanvas.getContext('2d');
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-      
-      let pieces = [];
-      for (let i = 0; i < 100; i++) {
-        pieces.push({x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, r: Math.random()*20+5, d: Math.random()*5+2});
-      }
-
-      function draw() {
-        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-        pieces.forEach(p => {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fillStyle = `hsl(${Math.random()*360}, 100%, 50%)`;
-          ctx.fill();
-          p.y += p.d;
-          if (p.y > window.innerHeight) p.y = 0;
-        });
-        requestAnimationFrame(draw);
-      }
-      draw();
-    }
+    window.onload = function () {
+      setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+      }, 1500); // Splashscreen 1,5 Sekunden
+    };
   </script>
-
-
 </body>
 </html>

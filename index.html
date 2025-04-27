@@ -116,6 +116,12 @@
   <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;" class="hidden"></canvas>
 
   <script>
+    // Splashscreen automatisch ausblenden
+window.onload = function() {
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+  }, 1500); // Splashscreen 1,5 Sekunden
+};
     let defaultQuestions = [
       "Wer würde am ehesten sein Handy im Klo versenken?",
       "Wer würde am ehesten nackt durch die Stadt laufen?",
@@ -274,12 +280,7 @@
       draw();
     }
   </script>
-// Splashscreen automatisch ausblenden
-window.onload = function() {
-  setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-  }, 1500); // Splashscreen 1,5 Sekunden
-};
+
 
 </body>
 </html>

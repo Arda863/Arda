@@ -2,41 +2,56 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>That's him! - Ultimate Edition</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.png" type="image/png">
-  <meta name="theme-color" content="#6200ea">
   <style>
-    body {<!-- Startbildschirm mit Animation -->
-<div id="splash">
-  <h1>🎉 That's him! 🎉</h1>
-  <p>Bereit für das ultimative Party-Spiel?</p>
-</div>
-
+    body {
       font-family: 'Arial', sans-serif;
-      text-align: center;
-      padding: 20px;
-      transition: background 0.5s, color 0.5s;
+      margin: 0;
+      overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
     }
+
     body.light {
       background-color: #ffffff;
       color: #000000;
     }
+
     body.dark {
       background-color: #121212;
       color: #f1f1f1;
     }
-    h1 {
-      font-size: 48px;
-      margin-bottom: 10px;
+
+    /* Startbildschirm */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(98,0,234,1) 0%, rgba(0,255,255,1) 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      z-index: 1000;
+      animation: fadeIn 2s ease-in-out;
     }
-    #question {
-      font-size: 24px;
-      margin: 20px 0;
+
+    #splash h1 {
+      font-size: 60px;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.8);
+      margin-bottom: 20px;
     }
-    #players {
-      margin: 20px 0;
+
+    #splash p {
+      font-size: 25px;
+      opacity: 0.8;
+      animation: fadeInText 2s ease-in-out;
     }
+
+    /* Frage und Antwort Buttons */
     .player-btn {
       background: #6200ea;
       color: white;
@@ -48,11 +63,13 @@
       font-size: 18px;
       transition: all 0.3s;
     }
+
     .player-btn:hover {
       background: #3700b3;
       transform: scale(1.1) rotate(2deg);
     }
-    #next-btn, #start-btn, #mode-btn {
+
+    #next-btn, #start-btn, #mode-btn, #custom-question-btn {
       margin-top: 20px;
       padding: 10px 25px;
       font-size: 20px;
@@ -62,22 +79,19 @@
       border-radius: 12px;
       cursor: pointer;
     }
+
     #timer {
       font-size: 20px;
       margin: 10px;
       color: #bb86fc;
     }
-    #result {
-      margin-top: 20px;
-      font-size: 24px;
-      color: #03dac6;
-    }
-    .hidden {
-      display: none;
-    }
+
+    /* Avatar Auswahl */
     #avatar-selection {
       margin: 20px 0;
+      text-align: center;
     }
+
     .avatar-btn {
       font-size: 30px;
       margin: 5px;
@@ -85,134 +99,53 @@
       background: none;
       border: none;
     }
-    .exploding-btn {
-      animation: explode 0.5s forwards;
-    }
-    @keyframes explode {
+
+    /* Animationen */
+    @keyframes fadeIn {
       0% {
-        transform: scale(1);
+        opacity: 0;
       }
       100% {
-        transform: scale(1.5) rotate(45deg);
+        opacity: 1;
       }
     }
-  </style>
-  /* Hintergrund und Startbildschirm Animation */
-#splash {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(98,0,234,1) 0%, rgba(0,255,255,1) 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: white;
-  z-index: 1000;
-  animation: fadeIn 2s ease-in-out;
-}
 
-#splash h1 {
-  font-size: 60px;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.8);
-  margin-bottom: 20px;
-  animation: floatUp 2s ease-in-out infinite alternate;
-}
-
-#splash p {
-  font-size: 25px;
-  opacity: 0.8;
-  animation: fadeInText 2s ease-in-out;
-}
-
-/* Keyframes für Startscreen Animationen */
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInText {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes floatUp {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-10px);
-  }
-}
-  <head>
-  <meta charset="UTF-8">
-  <title>That's him! - Ultimate Edition</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.png" type="image/png">
-  <meta name="theme-color" content="#6200ea">
-  
-  <style>
-    /* Hier fügst du den CSS-Code für die Animationen ein */
-    /* ... (der oben stehende CSS-Code) ... */
+    @keyframes fadeInText {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
-  <body class="light">
+<body class="light">
+
   <!-- Startbildschirm mit Animation -->
   <div id="splash">
     <h1>🎉 That's him! 🎉</h1>
     <p>Bereit für das ultimative Party-Spiel?</p>
   </div>
 
-  <!-- Der Rest deines HTML-Codes folgt hier... -->
-</body>
-  
-
-
-<body class="light">
-
-  <h1>That's him! 🎉</h1>
-
-  <div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#6200ea;color:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:1000;">
-    <h1 style="font-size:50px;">🎉 That's him! 🎉</h1>
-    <p>Bereit für Spaß...</p>
-  </div>
-
+  <!-- Spielbereich -->
   <div id="question">Willkommen!</div>
-
   <div id="timer" class="hidden"></div>
-
   <div id="players"></div>
-
-  <div id="avatar-selection" class="hidden"></div>
 
   <button id="start-btn" onclick="startGame()">Start</button>
   <button id="next-btn" onclick="nextQuestion()" class="hidden">Nächste Frage</button>
   <button id="mode-btn" onclick="toggleMode()">🌗 Modus wechseln</button>
+  <button id="custom-question-btn" onclick="addCustomQuestion()">Eigene Frage hinzufügen</button>
 
   <div id="result" class="hidden"></div>
-
-  <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
-  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3" preload="auto"></audio>
-
-  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;" class="hidden"></canvas>
 
   <script>
     let defaultQuestions = [
       "Wer würde am ehesten sein Handy im Klo versenken?",
       "Wer würde am ehesten nackt durch die Stadt laufen?",
       "Wer würde am ehesten eine Reality-Show gewinnen?",
-      "Wer würde am ehesten einen Tag lang miauen?",
       "Wer würde am ehesten vergessen, wo sein Auto geparkt ist?",
       "Wer würde am ehesten in einer Band spielen?"
     ];
@@ -224,9 +157,8 @@
     let currentQuestion = "";
     let timer;
     let countdown = 15;
-    let roundCount = 5; // Default rounds
 
-    const allEmojis = ["😎", "🤡", "🦄", "🐉", "🧙‍♂️", "🐱‍👤", "🎃", "🧛", "👻", "🤖", "🐸", "🦖", "👑", "🚀", "🐱", "🐶", "🦊", "🐼", "🐵", "🐧", "🦋", "🐢", "🐙"];
+    const allEmojis = ["😎", "🤡", "🦄", "🐉", "🧙‍♂️", "🐱‍👤", "🎃", "🧛", "👻", "🤖", "🐸", "🦖", "👑", "🚀", "🐱", "🐶", "🦊", "🐼", "🐵", "🦋", "🐢", "🐙"];
 
     function startGame() {
       players = prompt("Gib die Spielernamen ein, getrennt durch Kommas (z.B. Max, Sarah, Lisa)").split(",").map(name => name.trim()).filter(name => name.length > 0);
@@ -240,13 +172,11 @@
 
     function selectAvatars() {
       document.getElementById('question').innerText = "Wählt eure Avatare!";
-      document.getElementById('avatar-selection').classList.remove('hidden');
-      document.getElementById('players').innerHTML = "";
       let html = "";
       allEmojis.forEach(emoji => {
         html += `<button class="avatar-btn" onclick="chooseAvatar('${emoji}')">${emoji}</button>`;
       });
-      document.getElementById('avatar-selection').innerHTML = html;
+      document.getElementById('players').innerHTML = html;
     }
 
     function chooseAvatar(emoji) {
@@ -262,15 +192,14 @@
     function startQuestions() {
       questions = [...defaultQuestions];
       shuffleArray(questions);
-      document.getElementById('avatar-selection').classList.add('hidden');
-      document.getElementById('start-btn').classList.add('hidden');
-      document.getElementById('next-btn').classList.remove('hidden');
+      document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('next-btn').style.display = 'block';
       nextQuestion();
     }
 
     function nextQuestion() {
       clearInterval(timer);
-      document.getElementById('timer').classList.remove('hidden');
+      document.getElementById('timer').style.display = 'block';
       countdown = 15;
       updateTimer();
 
@@ -298,60 +227,46 @@
     }
 
     function updateTimer() {
-      document.getElementById('timer').innerText = `Zeit: ${countdown}s`;
+      document.getElementById('timer').innerText = `${countdown} Sekunden verbleibend`;
     }
 
     function selectPlayer(player) {
       scores[player]++;
-      showExplosionEffect();
+      alert(`${player} hat gewählt!`);
       nextQuestion();
-    }
-
-    function showExplosionEffect() {
-      let selectedPlayerBtn = event.target;
-      selectedPlayerBtn.classList.add('exploding-btn');
-      setTimeout(() => {
-        selectedPlayerBtn.classList.remove('exploding-btn');
-      }, 500);
     }
 
     function endGame() {
       let winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-      let highestScore = scores[winner];
-      document.getElementById('result').innerText = `Spiel beendet! Der Gewinner ist ${winner} mit ${highestScore} Punkten!`;
-      document.getElementById('result').classList.remove('hidden');
-      document.getElementById('next-btn').classList.add('hidden');
+      document.getElementById('result').innerHTML = `Der Gewinner ist: ${winner}!`;
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('next-btn').style.display = 'none';
     }
 
     function toggleMode() {
-      if (document.body.classList.contains('light')) {
-        document.body.classList.remove('light');
-        document.body.classList.add('dark');
-      } else {
-        document.body.classList.remove('dark');
-        document.body.classList.add('light');
+      document.body.classList.toggle('dark');
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
     }
 
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    function addCustomQuestion() {
+      let customQuestion = prompt("Gib eine eigene Frage ein:");
+      if (customQuestion) {
+        defaultQuestions.push(customQuestion);
+        alert("Deine Frage wurde hinzugefügt!");
       }
     }
 
     window.onload = function () {
       setTimeout(() => {
         document.getElementById('splash').style.display = 'none';
-      }, 1500); // Splashscreen 1,5 Sekunden
+      }, 2500);
     };
-    window.onload = function () {
-  // Startbildschirm für 2,5 Sekunden anzeigen und dann ausblenden
-  setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-  }, 2500); // Splashscreen 2,5 Sekunden
-};
-
   </script>
 </body>
 </html>

@@ -3,181 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <title>That's him!</title>
- <style>
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: #f1f1f1;
-    text-align: center;
-    padding: 20px;
-  }
-  h1 {
-    font-size: 48px;
-    margin-bottom: 10px;
-  }
-  #question {
-    font-size: 24px;
-    margin: 20px 0;
-  }
-  #players {
-    margin: 20px 0;
-  }
-  .player-btn {
-    background: #6200ea;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 18px;
-    transition: background 0.3s;
-  }
-  .player-btn:hover {
-    background: #3700b3;
-  }
-  #next-btn, #start-btn {
-    margin-top: 30px;
-    padding: 10px 25px;
-    font-size: 20px;
-    background: #03dac6;
-    color: black;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    display: inline-block;
-  }
-  #timer {
-    font-size: 20px;
-    margin: 10px;
-    color: #bb86fc;
-  }
-  #result {
-    margin-top: 20px;
-    font-size: 24px;
-    color: #03dac6;
-  }
-  .hidden {
-    display: none;
-  }
-</style>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    #question {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+    #players {
+      margin: 20px 0;
+    }
+    .player-btn {
+      background: #6200ea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s;
+    }
+    .player-btn:hover {
+      background: #3700b3;
+    }
+    #next-btn, #start-btn {
+      margin-top: 30px;
+      padding: 10px 25px;
+      font-size: 20px;
+      background: #03dac6;
+      color: black;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    #timer {
+      font-size: 20px;
+      margin: 10px;
+      color: #bb86fc;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #03dac6;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
   <h1>That's him!</h1>
 
-<div id="question">Willkommen! 🎉</div>
+  <div id="question">Willkommen! 🎉</div>
+  
+  <div id="timer" class="hidden"></div>
 
-<div id="timer" class="hidden"></div>
+  <div id="players"></div>
 
-<div id="players"></div>
+  <button id="start-btn" onclick="startGame()">Start</button>
+  <button id="next-btn" onclick="nextQuestion()" class="hidden">Nächste Frage</button>
 
-<button id="start-btn" onclick="startGame()">Start</button>
-<button id="next-btn" onclick="nextQuestion()" class="hidden">Nächste Frage</button>
+  <div id="result" class="hidden"></div>
 
-<div id="result" class="hidden"></div>
+  <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
 
-<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+  <script>
+    let defaultQuestions = [
+      "Wer würde am ehesten im Lotto gewinnen und alles wieder verlieren?",
+      "Wer würde am ehesten sein Handy auf der Toilette fallen lassen?",
+      "Wer würde am ehesten bei einer Reality-Show ausrasten?",
+      "Wer würde am ehesten einen Tag lang nur miauen?",
+      "Wer würde am ehesten den Job kündigen, ohne einen Plan zu haben?"
+    ];
 
+    let players = [];
+    let scores = {};
+    let questions = [];
+    let currentQuestion = "";
+    let timer;
+    let countdown = 15;
 
-<script>
-  let defaultQuestions = [
-    "Wer würde am ehesten im Lotto gewinnen und alles wieder verlieren?",
-    "Wer würde am ehesten sein Handy auf der Toilette fallen lassen?",
-    "Wer würde am ehesten bei einer Reality-Show ausrasten?",
-    "Wer würde am ehesten einen Tag lang nur miauen?",
-    "Wer würde am ehesten den Job kündigen, ohne einen Plan zu haben?"
-  ];
-
-  let players = [];
-  let scores = {};
-  let questions = [];
-  let currentQuestion = "";
-  let timer;
-  let countdown = 15;
-
-  function startGame() {
-    const names = prompt("Gib die Spielernamen ein, getrennt durch Kommas (z.B. Max, Sarah, Lisa)").split(",").map(name => name.trim()).filter(name => name.length > 0);
-    if (names.length < 2) {
-      alert("Mindestens 2 Spieler werden benötigt!");
-      return;
-    }
-    players = names;
-    players.forEach(p => scores[p] = 0);
-
-    let addOwn = confirm("Willst du eigene Fragen hinzufügen?");
-    if (addOwn) {
-      let ownQuestions = prompt("Gib deine Fragen ein, getrennt durch Semikolons (;)");
-      if (ownQuestions) {
-        questions = ownQuestions.split(";").map(q => q.trim()).filter(q => q.length > 0);
+    function startGame() {
+      const names = prompt("Gib die Spielernamen ein, getrennt durch Kommas (z.B. Max, Sarah, Lisa)").split(",").map(name => name.trim()).filter(name => name.length > 0);
+      if (names.length < 2) {
+        alert("Mindestens 2 Spieler werden benötigt!");
+        return;
       }
+      players = names;
+      players.forEach(p => scores[p] = 0);
+
+      let addOwn = confirm("Willst du eigene Fragen hinzufügen?");
+      if (addOwn) {
+        let ownQuestions = prompt("Gib deine Fragen ein, getrennt durch Semikolons (;)");
+        if (ownQuestions) {
+          questions = ownQuestions.split(";").map(q => q.trim()).filter(q => q.length > 0);
+        }
+      }
+      if (questions.length === 0) {
+        questions = [...defaultQuestions];
+      }
+
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('next-btn').classList.remove('hidden');
+      nextQuestion();
     }
-    if (questions.length === 0) {
-      questions = [...defaultQuestions];
-    }
 
-    document.getElementById('start-btn').classList.add('hidden');
-    document.getElementById('next-btn').classList.remove('hidden');
-    nextQuestion();
-  }
-
-  function nextQuestion() {
-    clearInterval(timer);
-    document.getElementById('timer').classList.remove('hidden');
-    countdown = 15;
-    updateTimer();
-
-    if (questions.length === 0) {
-      endGame();
-      return;
-    }
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    currentQuestion = questions.splice(randomIndex, 1)[0];
-    document.getElementById('question').innerText = currentQuestion;
-
-    let playersHtml = '';
-    players.forEach(player => {
-      playersHtml += `<button class="player-btn" onclick="selectPlayer('${player}')">${player}</button>`;
-    });
-    document.getElementById('players').innerHTML = playersHtml;
-
-    timer = setInterval(() => {
-      countdown--;
+    function nextQuestion() {
+      clearInterval(timer);
+      document.getElementById('timer').classList.remove('hidden');
+      countdown = 15;
       updateTimer();
-      if (countdown <= 0) {
-        clearInterval(timer);
-        alert("Zeit abgelaufen! 😬");
-        nextQuestion();
+
+      if (questions.length === 0) {
+        endGame();
+        return;
       }
-    }, 1000);
-  }
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      currentQuestion = questions.splice(randomIndex, 1)[0];
+      document.getElementById('question').innerText = currentQuestion;
 
-  function updateTimer() {
-    document.getElementById('timer').innerText = `⏳ Zeit: ${countdown}s`;
-  }
+      let playersHtml = '';
+      players.forEach(player => {
+        playersHtml += `<button class="player-btn" onclick="selectPlayer('${player}')">${player}</button>`;
+      });
+      document.getElementById('players').innerHTML = playersHtml;
 
-  function selectPlayer(playerName) {
-    const sound = document.getElementById('clickSound');
-    sound.play();
+      timer = setInterval(() => {
+        countdown--;
+        updateTimer();
+        if (countdown <= 0) {
+          clearInterval(timer);
+          alert("Zeit abgelaufen! 😬");
+          nextQuestion();
+        }
+      }, 1000);
+    }
 
-    scores[playerName]++;
-    alert(`${playerName} wurde gewählt! 🎉 (+1 Punkt)`);
+    function updateTimer() {
+      document.getElementById('timer').innerText = `⏳ Zeit: ${countdown}s`;
+    }
 
-    nextQuestion();
-  }
+    function selectPlayer(playerName) {
+      const sound = document.getElementById('clickSound');
+      sound.play();
 
-  function endGame() {
-    document.getElementById('question').innerText = "Spiel beendet! 🎊";
-    document.getElementById('players').innerHTML = "";
-    document.getElementById('timer').classList.add('hidden');
-    document.getElementById('next-btn').classList.add('hidden');
+      scores[playerName]++;
+      alert(`${playerName} wurde gewählt! 🎉 (+1 Punkt)`);
 
-    let winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-    document.getElementById('result').classList.remove('hidden');
-    document.getElementById('result').innerHTML = `🏆 Gewinner: <strong>${winner[0]}</strong> mit <strong>${winner[1]} Punkten</strong>!`;
-  }
-</script>
+      nextQuestion();
+    }
 
+    function endGame() {
+      document.getElementById('question').innerText = "Spiel beendet! 🎊";
+      document.getElementById('players').innerHTML = "";
+      document.getElementById('timer').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      let winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('result').innerHTML = `🏆 Gewinner: <strong>${winner[0]}</strong> mit <strong>${winner[1]} Punkten</strong>!`;
+    }
+  </script>
 
 </body>
 </html>

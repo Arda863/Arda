@@ -1,15 +1,34 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <head>
   <meta charset="UTF-8">
-  <title>That's him!</title>
+  <title>That's him! - Ultra Edition</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <meta name="theme-color" content="#6200ea">
   <style>
-    body {
+    /* hier bleibt dein gesamtes CSS */
+  </style>
+</head>
+  <style>
+    body {<div id="splash" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#6200ea;color:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:1000;">
+  <h1 style="font-size:50px;">🎉 That's him! 🎉</h1>
+  <p>Bereit für Spaß...</p>
+</div>
+
       font-family: 'Arial', sans-serif;
-      background-color: #121212;
-      color: #f1f1f1;
       text-align: center;
       padding: 20px;
+      transition: background 0.5s, color 0.5s;
+    }
+    body.light {
+      background-color: #ffffff;
+      color: #000000;
+    }
+    body.dark {
+      background-color: #121212;
+      color: #f1f1f1;
     }
     h1 {
       font-size: 48px;
@@ -31,13 +50,14 @@
       border-radius: 10px;
       cursor: pointer;
       font-size: 18px;
-      transition: background 0.3s;
+      transition: all 0.3s;
     }
     .player-btn:hover {
       background: #3700b3;
+      transform: scale(1.1) rotate(2deg);
     }
-    #next-btn, #start-btn {
-      margin-top: 30px;
+    #next-btn, #start-btn, #mode-btn {
+      margin-top: 20px;
       padding: 10px 25px;
       font-size: 20px;
       background: #03dac6;
@@ -45,7 +65,6 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      display: inline-block;
     }
     #timer {
       font-size: 20px;
@@ -60,61 +79,97 @@
     .hidden {
       display: none;
     }
+    #avatar-selection {
+      margin: 20px 0;
+    }
+    .avatar-btn {
+      font-size: 30px;
+      margin: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
   </style>
 </head>
-<body>
 
-  <h1>That's him!</h1>
+<body class="light">
 
-  <div id="question">Willkommen! 🎉</div>
-  
+  <h1>That's him! 🎉</h1>
+
+  <div id="question">Willkommen!</div>
+
   <div id="timer" class="hidden"></div>
 
   <div id="players"></div>
 
+  <div id="avatar-selection" class="hidden"></div>
+
   <button id="start-btn" onclick="startGame()">Start</button>
   <button id="next-btn" onclick="nextQuestion()" class="hidden">Nächste Frage</button>
+  <button id="mode-btn" onclick="toggleMode()">🌗 Modus wechseln</button>
 
   <div id="result" class="hidden"></div>
 
   <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3" preload="auto"></audio>
+
+  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;" class="hidden"></canvas>
 
   <script>
     let defaultQuestions = [
-      "Wer würde am ehesten im Lotto gewinnen und alles wieder verlieren?",
-      "Wer würde am ehesten sein Handy auf der Toilette fallen lassen?",
-      "Wer würde am ehesten bei einer Reality-Show ausrasten?",
-      "Wer würde am ehesten einen Tag lang nur miauen?",
-      "Wer würde am ehesten den Job kündigen, ohne einen Plan zu haben?"
+      "Wer würde am ehesten sein Handy im Klo versenken?",
+      "Wer würde am ehesten nackt durch die Stadt laufen?",
+      "Wer würde am ehesten eine Reality-Show gewinnen?",
+      "Wer würde am ehesten einen Tag lang miauen?",
+      "Wer würde am ehesten vergessen, wo sein Auto geparkt ist?",
+      "Wer würde am ehesten in einer Band spielen?"
     ];
 
     let players = [];
+    let avatars = [];
     let scores = {};
     let questions = [];
     let currentQuestion = "";
     let timer;
     let countdown = 15;
 
+    const allEmojis = ["😎", "🤡", "🦄", "🐉", "🧙‍♂️", "🐱‍👤", "🎃", "🧛", "👻", "🤖", "🐸", "🦖", "👑", "🚀", "🐱", "🐶", "🦊", "🐼", "🐵", "🐧", "🦋", "🐢", "🐙"];
+
     function startGame() {
-      const names = prompt("Gib die Spielernamen ein, getrennt durch Kommas (z.B. Max, Sarah, Lisa)").split(",").map(name => name.trim()).filter(name => name.length > 0);
-      if (names.length < 2) {
+      players = prompt("Gib die Spielernamen ein, getrennt durch Kommas (z.B. Max, Sarah, Lisa)").split(",").map(name => name.trim()).filter(name => name.length > 0);
+      if (players.length < 2) {
         alert("Mindestens 2 Spieler werden benötigt!");
         return;
       }
-      players = names;
       players.forEach(p => scores[p] = 0);
+      selectAvatars();
+    }
 
-      let addOwn = confirm("Willst du eigene Fragen hinzufügen?");
-      if (addOwn) {
-        let ownQuestions = prompt("Gib deine Fragen ein, getrennt durch Semikolons (;)");
-        if (ownQuestions) {
-          questions = ownQuestions.split(";").map(q => q.trim()).filter(q => q.length > 0);
-        }
-      }
-      if (questions.length === 0) {
-        questions = [...defaultQuestions];
-      }
+    function selectAvatars() {
+      document.getElementById('question').innerText = "Wählt eure Avatare!";
+      document.getElementById('avatar-selection').classList.remove('hidden');
+      document.getElementById('players').innerHTML = "";
+      let html = "";
+      allEmojis.forEach(emoji => {
+        html += `<button class="avatar-btn" onclick="chooseAvatar('${emoji}')">${emoji}</button>`;
+      });
+      document.getElementById('avatar-selection').innerHTML = html;
+    }
 
+    function chooseAvatar(emoji) {
+      avatars.push(emoji);
+      allEmojis.splice(allEmojis.indexOf(emoji), 1);
+      if (avatars.length >= players.length) {
+        startQuestions();
+      } else {
+        selectAvatars();
+      }
+    }
+
+    function startQuestions() {
+      questions = [...defaultQuestions];
+      shuffleArray(questions);
+      document.getElementById('avatar-selection').classList.add('hidden');
       document.getElementById('start-btn').classList.add('hidden');
       document.getElementById('next-btn').classList.remove('hidden');
       nextQuestion();
@@ -130,13 +185,12 @@
         endGame();
         return;
       }
-      const randomIndex = Math.floor(Math.random() * questions.length);
-      currentQuestion = questions.splice(randomIndex, 1)[0];
+      currentQuestion = questions.pop();
       document.getElementById('question').innerText = currentQuestion;
 
       let playersHtml = '';
-      players.forEach(player => {
-        playersHtml += `<button class="player-btn" onclick="selectPlayer('${player}')">${player}</button>`;
+      players.forEach((player, index) => {
+        playersHtml += `<button class="player-btn" onclick="selectPlayer('${player}')">${avatars[index]} ${player}</button>`;
       });
       document.getElementById('players').innerHTML = playersHtml;
 
@@ -156,24 +210,68 @@
     }
 
     function selectPlayer(playerName) {
-      const sound = document.getElementById('clickSound');
-      sound.play();
-
+      document.getElementById('clickSound').play();
       scores[playerName]++;
       alert(`${playerName} wurde gewählt! 🎉 (+1 Punkt)`);
-
       nextQuestion();
     }
 
     function endGame() {
-      document.getElementById('question').innerText = "Spiel beendet! 🎊";
       document.getElementById('players').innerHTML = "";
-      document.getElementById('timer').classList.add('hidden');
       document.getElementById('next-btn').classList.add('hidden');
-
-      let winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('timer').classList.add('hidden');
+      document.getElementById('question').innerText = "Spiel beendet! 🎊";
       document.getElementById('result').classList.remove('hidden');
-      document.getElementById('result').innerHTML = `🏆 Gewinner: <strong>${winner[0]}</strong> mit <strong>${winner[1]} Punkten</strong>!`;
+      
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      let resultHtml = "<h2>🏆 Highscore:</h2><ul>";
+      sorted.forEach(([player, points]) => {
+        resultHtml += `<li>${player}: ${points} Punkte</li>`;
+      });
+      resultHtml += "</ul>";
+      document.getElementById('result').innerHTML = resultHtml;
+
+      launchConfetti();
+      document.getElementById('winSound').play();
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle('dark');
+      document.body.classList.toggle('light');
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function launchConfetti() {
+      const confettiCanvas = document.getElementById('confetti-canvas');
+      confettiCanvas.classList.remove('hidden');
+      const ctx = confettiCanvas.getContext('2d');
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      
+      let pieces = [];
+      for (let i = 0; i < 100; i++) {
+        pieces.push({x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, r: Math.random()*20+5, d: Math.random()*5+2});
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        pieces.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fillStyle = `hsl(${Math.random()*360}, 100%, 50%)`;
+          ctx.fill();
+          p.y += p.d;
+          if (p.y > window.innerHeight) p.y = 0;
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
     }
   </script>
 

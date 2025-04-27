@@ -274,6 +274,12 @@
       draw();
     }
   </script>
+// Splashscreen automatisch ausblenden
+window.onload = function() {
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+  }, 1500); // Splashscreen 1,5 Sekunden
+};
 
 </body>
 </html>
